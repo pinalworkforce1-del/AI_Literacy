@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>BOOST Module 5 — AI & YOU</title>
+<title>BOOST — AI & YOU</title>
 <style>
 :root{--n:#103b59;--n2:#092b43;--t:#0d918b;--g:#f4bd2f;--i:#233746;--m:#667a87;--l:#d5dfe5;--bg:#eef3f5;--ok:#2f7d4a;--warn:#9b6a00}
 *{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:var(--i)}button,textarea{font:inherit}.w{max-width:1120px;margin:auto}.hero{background:linear-gradient(135deg,#092b43,var(--n));color:white;border-bottom:5px solid var(--g);padding:28px 16px}.hero h1{font-size:clamp(38px,7vw,68px);margin:4px 0}.hero p{max-width:860px;line-height:1.5}.goal{padding:12px;background:#ffffff18;border:1px solid #ffffff44;border-radius:12px;max-width:900px}.goal b{color:var(--g)}
@@ -249,8 +249,9 @@ function buildSnapshot(){
 }
 async function saveJourney(snapshot,badges){
  const j=readJourney(),c=getCareer(),ref=$('reflection').value.trim();
- j.schema_version=j.schema_version||2;j.region=j.region||'Pinal County';j.modules=j.modules||{};
- j.modules.module5={version:'ai-you-v2-20260916',completed_at:new Date().toISOString(),career_context:c,scenario:{id:st.sector,label:S[st.sector].label,recommended:scenarioForCareer(c)===st.sector},clear_prompt:{elements_present:snapshot.clearElements,status:snapshot.statuses['Directing AI']},judgment:{sample_response:st.sampleJudgment,challenge_direct:st.challenge[1],challenge_check:st.challenge[2],challenge_privacy:st.challenge[3]},snapshot:snapshot.statuses,reflection:ref,badges};
+ j.schema_version=j.schema_version||2;j.region=j.region||'Pinal County';j.modules=j.modules||{};j.progress=j.progress||{};
+ j.modules.ai={version:'ai-you-v2-20260924',module:'ai',completed_at:new Date().toISOString(),career_context:c,scenario:{id:st.sector,label:S[st.sector].label,recommended:scenarioForCareer(c)===st.sector},clear_prompt:{elements_present:snapshot.clearElements,status:snapshot.statuses['Directing AI']},judgment:{sample_response:st.sampleJudgment,challenge_direct:st.challenge[1],challenge_check:st.challenge[2],challenge_privacy:st.challenge[3]},snapshot:snapshot.statuses,reflection:ref,badges};
+ j.progress.ai='complete';
  j.updated_at=new Date().toISOString();localStorage.setItem(JOURNEY_KEY,JSON.stringify(j));
  if(pinalLaunch){await ensurePinalIntegration();if(window.PinalBOOSTCloud){const ok=await window.PinalBOOSTCloud.saveNow();$('saveStatus').textContent=ok?'Saved to your Pinal BOOST journey.':'Saved on this device. BOOST will sync it when your signed-in connection is available.'}else $('saveStatus').textContent='Saved on this device.'}
  else $('saveStatus').textContent='Practice snapshot saved in this browser. When launched from Pinal BOOST, it also carries into the Pinal journey record.';
