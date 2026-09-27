@@ -119,8 +119,6 @@ main .w{padding:16px}.p{background:white;border:1px solid var(--l);border-radius
 </div>
 
 <section class="p result" id="result">
-<div id="completionCelebration" class="celebration" role="status" aria-live="polite"><div class="burst">✦ ✨ ✦</div><h2>Congratulations!</h2><p><b>You completed AI & You.</b></p><p>You practiced giving AI clear direction, protecting information, checking AI output, and using human judgment before acting.</p></div>
-<div id="aiCertificate" class="certificate"><div class="certKicker">BOOST • CERTIFICATE OF COMPLETION</div><h2>AI & You</h2><div class="certName" id="certName">BOOST Participant</div><div class="certText">has completed the BOOST <b>AI & You</b> learning experience and practiced responsible workplace use of artificial intelligence through clear direction, information protection, output review, and human judgment.</div><div class="certDate" id="certDate"></div><div style="margin-top:12px;font-size:11px;color:#6a7c86">Certificate of completion • This is not an industry certification or professional credential.</div></div>
 <div class="step">AI & You • Practice Snapshot</div>
 <div class="rh"><div>AI PRACTICE SNAPSHOT</div><h2 id="snapshotTitle">Practice complete</h2><div id="snapshotCareer"></div></div>
 <div class="snapshotGrid" id="snapshotGrid"></div>
@@ -128,7 +126,7 @@ main .w{padding:16px}.p{background:white;border:1px solid var(--l);border-radius
 <div class="box" style="margin-top:12px"><h3>BOOST Takeaway</h3><p id="take"></p><p><b>Remember:</b> Give AI useful direction. Protect information. Check what it produces. Use human judgment before acting.</p></div>
 <div class="rosie" style="margin-top:14px"><div class="rosieHead"><div class="rosieMark">R</div><div><b>Rosie • Connect this to what comes next</b><div class="sub">I can use your BOOST direction and this practice snapshot to explain what you just demonstrated—without treating this activity like a certification.</div></div></div><div class="actions"><button class="btn teal" onclick="askRosieWrap()">Ask Rosie to connect my snapshot to my next steps</button></div><div class="rosieResponse" id="rosieWrapResponse"></div></div>
 <div class="saveStatus" id="saveStatus">Saving your AI & You practice evidence to your BOOST journey…</div>
-<div class="actions"><button class="btn gold" onclick="printCertificate()">PRINT / SAVE MY CERTIFICATE</button><button class="btn" onclick="window.print()">PRINT / SAVE MY PRACTICE SNAPSHOT</button><button class="btn light" onclick="location.reload()">TRY AGAIN</button></div>
+<div class="actions"><button class="btn gold" onclick="window.print()">PRINT / SAVE MY PRACTICE SNAPSHOT</button><button class="btn light" onclick="location.reload()">TRY AGAIN</button></div>
 </section>
 </div></main>
 
@@ -145,14 +143,6 @@ function participantName(){
  return p.fullName||p.name||[p.firstName,p.lastName].filter(Boolean).join(' ')||p.first_name||'BOOST Participant';
 }
 function completionDateLabel(iso=new Date().toISOString()){try{return new Intl.DateTimeFormat('en-US',{month:'long',day:'numeric',year:'numeric'}).format(new Date(iso))}catch(_){return''}}
-function launchCelebration(){
- const wrap=document.createElement('div');wrap.className='confettiLayer';document.body.appendChild(wrap);
- const colors=['#f4bd2f','#28a6b3','#ffffff','#60b878','#db6c87'];
- for(let i=0;i<90;i++){const x=document.createElement('i');x.className='confettiPiece';x.style.left=(Math.random()*100)+'vw';x.style.background=colors[i%colors.length];x.style.setProperty('--dur',(2.4+Math.random()*2.3)+'s');x.style.setProperty('--drift',(-100+Math.random()*200)+'px');x.style.setProperty('--rot',(Math.random()*360)+'deg');x.style.animationDelay=(Math.random()*.7)+'s';wrap.appendChild(x)}
- [[18,22],[50,14],[82,24]].forEach(([left,top],i)=>{setTimeout(()=>{const fw=document.createElement('div');fw.className='firework';fw.style.left=left+'vw';fw.style.top=top+'vh';document.body.appendChild(fw);setTimeout(()=>fw.remove(),1100)},i*230)});
- setTimeout(()=>wrap.remove(),5200);
-}
-function printCertificate(){document.body.classList.add('printCertificate');window.print();setTimeout(()=>document.body.classList.remove('printCertificate'),400)}
 
 let st={sector:null,promptHits:[false,false,false,false,false],sampleJudgment:null,challenge:{1:null,2:null,3:null},learn:null,saved:false};
 let pinalLaunch=false, integrationPromise=null, currentAudio=null,lastAudioKey=null;
@@ -273,7 +263,7 @@ async function saveJourney(snapshot,badges){
  const j=readJourney(),c=getCareer(),ref=$('reflection').value.trim();
  j.schema_version=j.schema_version||2;j.region=j.region||'Pinal County';j.modules=j.modules||{};j.progress=j.progress||{};
  const completedAt=new Date().toISOString(),certName=participantName();
- j.modules.ai={version:'ai-you-v2-20260927-celebration',module:'ai',completed_at:completedAt,career_context:c,scenario:{id:st.sector,label:S[st.sector].label,recommended:scenarioForCareer(c)===st.sector},clear_prompt:{elements_present:snapshot.clearElements,status:snapshot.statuses['Directing AI']},judgment:{sample_response:st.sampleJudgment,challenge_direct:st.challenge[1],challenge_check:st.challenge[2],challenge_privacy:st.challenge[3]},snapshot:snapshot.statuses,reflection:ref,badges,certificate:{type:'completion',title:'AI & You',participant_name:certName,completed_at:completedAt,statement:'Completed the BOOST AI & You learning experience and practiced responsible workplace use of AI.'}};
+ j.modules.ai={version:'ai-you-v2-20260927-celebration',module:'ai',completed_at:completedAt,career_context:c,scenario:{id:st.sector,label:S[st.sector].label,recommended:scenarioForCareer(c)===st.sector},clear_prompt:{elements_present:snapshot.clearElements,status:snapshot.statuses['Directing AI']},judgment:{sample_response:st.sampleJudgment,challenge_direct:st.challenge[1],challenge_check:st.challenge[2],challenge_privacy:st.challenge[3]},snapshot:snapshot.statuses,reflection:ref,badges,pathway_completion:{eligible:true,participant_name:certName,completed_at:completedAt,trigger:'ai_complete'}};
  j.progress.ai='complete';
  j.updated_at=new Date().toISOString();localStorage.setItem(JOURNEY_KEY,JSON.stringify(j));
  if(pinalLaunch){await ensurePinalIntegration();if(window.PinalBOOSTCloud){const ok=await window.PinalBOOSTCloud.saveNow();$('saveStatus').textContent=ok?'Saved to your Pinal BOOST journey.':'Saved on this device. BOOST will sync it when your signed-in connection is available.'}else $('saveStatus').textContent='Saved on this device.'}
@@ -290,8 +280,7 @@ async function finish(){
  $('badges').innerHTML=(badges.length?badges:['🎯 Practice Completed']).map(x=>`<span class="badge">${x}</span>`).join('');
  $('take').textContent='This snapshot describes what you practiced in this activity. It is not a certification or an employer assessment. The useful evidence is how you directed AI, protected information, checked an output, and explained how you would use AI responsibly at work.';
  $('result').classList.add('show');
- const completedAt=new Date().toISOString();$('certName').textContent=participantName();$('certDate').textContent='Completed '+completionDateLabel(completedAt);$('aiCertificate').classList.add('show');$('completionCelebration').classList.add('show');
- await saveJourney(snap,badges);launchCelebration();boostOfferCompletion('ai',$('result'));$('result').scrollIntoView({behavior:'smooth',block:'start'})
+ await saveJourney(snap,badges);boostOfferCompletion('ai',$('result'));$('result').scrollIntoView({behavior:'smooth',block:'start'})
 }
 function boostOfferCompletion(moduleId,mount){
  const p=new URLSearchParams(location.search),returnUrl=p.get('boost_return'),requested=p.get('boost_module'),nonce=p.get('boost_nonce');if(!returnUrl||requested!==moduleId||!nonce||!mount)return;
