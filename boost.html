@@ -15,14 +15,14 @@ window.__BOOST_AI_NORTHERN=/\/Northern-BOOST\//i.test(window.__BOOST_AI_RETURN);
 </script>
 </head>
 <body>
-<header class="boostShellNav"><div class="boostShellTitle"><b id="boostShellTitle">AI & You • BOOST</b><span>Complete the activity and build your practice snapshot before returning to the BOOST map.</span></div><div class="boostSaveState" id="saveState">Ready</div><button class="boostReturn" id="saveReturn" type="button" style="display:none">← Save Completion &amp; Return to BOOST</button></header>
+<header class="boostShellNav"><div class="boostShellTitle"><b id="boostShellTitle">AI & You • BOOST</b><span>Complete the activity and build your practice snapshot before returning to the BOOST map.</span></div><div class="boostSaveState" id="saveState">Ready</div><button class="boostReturn" id="clearModule" type="button">↺ Clear Module</button><button class="boostReturn" id="saveReturn" type="button" style="display:none">← Save Completion &amp; Return to BOOST</button></header>
 <iframe class="boostFrame" id="aiFrame" title="BOOST — AI & You"></iframe>
 <div class="loading" id="loading"><div><b>Loading AI & You…</b><span>Connecting the activity to your Pinal BOOST journey.</span></div></div>
 <script>
 (()=>{'use strict';
 const IS_NORTHERN=!!window.__BOOST_AI_NORTHERN;
 const JK=IS_NORTHERN?'boost_naz_journey_v1':'pinal_boost_journey_v1';
-const frame=document.getElementById('aiFrame'),btn=document.getElementById('saveReturn'),saveState=document.getElementById('saveState'),loading=document.getElementById('loading');
+const frame=document.getElementById('aiFrame'),btn=document.getElementById('saveReturn'),clearBtn=document.getElementById('clearModule'),saveState=document.getElementById('saveState'),loading=document.getElementById('loading');
 document.getElementById('boostShellTitle').textContent='AI & You • '+(IS_NORTHERN?'Northern BOOST':'Pinal BOOST');
 function loadScript(src){return new Promise((resolve,reject)=>{const x=document.createElement('script');x.src=src;x.onload=resolve;x.onerror=reject;document.head.appendChild(x)})}
 async function loadRegionalCloud(){
@@ -39,6 +39,14 @@ async function loadRegionalCloud(){
 }
 function cloud(){return IS_NORTHERN?window.BOOSTCloud:window.PinalBOOSTCloud}
 function readJourney(){try{return JSON.parse(localStorage.getItem(JK)||'{}')||{}}catch{return{}}}
+async function clearAIModule(){
+ if(!confirm('Clear AI & You and start this module over? Other BOOST modules will not be deleted.'))return;
+ const j=readJourney();j.progress=j.progress||{};j.modules=j.modules||{};
+ delete j.progress.ai;delete j.progress.careerAi;delete j.modules.ai;delete j.modules.careerAi;delete j.modules.ai_checkpoint;delete j.ai;delete j.careerAi;delete j.completion;delete j.boostCompletedAt;
+ j.updatedAt=new Date().toISOString();j.updated_at=j.updatedAt;localStorage.setItem(JK,JSON.stringify(j));
+ try{const c=cloud();if(c?.flush)await c.flush();else if(c?.saveNow)await c.saveNow()}catch(_){}
+ location.reload();
+}
 function returnUrl(){const q=new URLSearchParams(location.search),raw=q.get('boost_return');if(raw){try{const u=new URL(raw,location.href);if(u.origin===location.origin)return u}catch(_){}}return new URL('https://pinalworkforce1-del.github.io/BOOST_Pathway-Portal/',location.href)}
 function frameState(){const w=frame.contentWindow,d=frame.contentDocument;let s={sector:null,promptHits:[false,false,false,false,false],sampleJudgment:null,challenge:{1:null,2:null,3:null},learn:null};try{s=w.eval('JSON.parse(JSON.stringify(st))')}catch(_){}const selected={};for(let r=1;r<=3;r++){const root=d?.getElementById('r'+r),wrong=root?.querySelector('.letterAns.wrong'),correct=root?.querySelector('.letterAns.correct');selected[r]=(wrong||correct)?.textContent?.trim()||null}const learnBtns=[...(d?.querySelectorAll('#learn .ans')||[])];let learnSelectedIndex=null;learnBtns.forEach((x,i)=>{if(x.style.outline)learnSelectedIndex=i});return{state:s,prompt:d?.getElementById('prompt')?.value||'',reflection:d?.getElementById('reflection')?.value||'',challengeSelected:selected,learnSelectedIndex,activeRound:d?.querySelector('.challengeRound.active')?.id||'round1',savedAt:new Date().toISOString()}}
 async function persistCheckpoint(){const j=readJourney(),now=new Date().toISOString(),existing=j.modules?.ai||null;j.schema_version=j.schema_version||2;j.region=IS_NORTHERN?'Northern Arizona':'Pinal County';j.modules=j.modules||{};j.modules.ai_checkpoint={version:'ai-you-v2-checkpoint-20260928',status:existing?.completed_at?'complete':'in_progress',...frameState(),career_context:(()=>{try{return frame.contentWindow.getCareer?.()||null}catch{return null}})()};j.updated_at=now;j.updatedAt=now;localStorage.setItem(JK,JSON.stringify(j));let saved=false;try{const c=cloud();if(c?.flush){await c.flush();saved=true}else if(c?.saveNow){saved=!!(await c.saveNow())}}catch(e){console.warn('BOOST AI checkpoint cloud save unavailable',e)}return saved}
@@ -56,7 +64,7 @@ saveState.textContent='Practice complete';
 btn.onclick=()=>saveAndReturn(true);
 d.getElementById('boostSaveReturn').onclick=()=>saveAndReturn(true)}}
 function buildFrameUrl(){const u=new URL('ai-you-v2.html',location.href),q=new URLSearchParams(location.search);q.forEach((v,k)=>u.searchParams.set(k,v));return u.toString()}
-frame.addEventListener('load',()=>{try{overrideCompletion();restoreCheckpoint();loading.classList.add('hidden')}catch(e){console.warn('AI shell setup incomplete',e);loading.classList.add('hidden')}});loadRegionalCloud().finally(()=>{frame.src=buildFrameUrl()});
+clearBtn.addEventListener('click',clearAIModule);frame.addEventListener('load',()=>{try{overrideCompletion();restoreCheckpoint();loading.classList.add('hidden')}catch(e){console.warn('AI shell setup incomplete',e);loading.classList.add('hidden')}});loadRegionalCloud().finally(()=>{frame.src=buildFrameUrl()});
 })();
 </script>
 </body>
