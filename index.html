@@ -210,11 +210,17 @@ function boostOfferCompletion(moduleId,mount){
  const p=new URLSearchParams(location.search),returnUrl=p.get('boost_return'),requested=p.get('boost_module'),nonce=p.get('boost_nonce');
  if(!returnUrl||requested!==moduleId||!nonce||!mount)return;
  let target;
- try{target=new URL(returnUrl,location.href);if(target.origin!==location.origin)return}catch(_){return}
+ try{target=new URL(returnUrl,location.href);if(!['https://pinal.boostpathways.org','https://pinalworkforce1-del.github.io'].includes(target.origin))return}catch(_){return}
  let box=document.getElementById('boostCompletionReturn');
  if(!box){box=document.createElement('div');box.id='boostCompletionReturn';box.style.cssText='margin:20px 0;padding:20px;border:3px solid #16835b;border-radius:16px;background:#effff7;text-align:center';mount.appendChild(box)}
  box.innerHTML='<h3 style="margin:0 0 8px">Activity Complete</h3><p style="margin:0 0 14px">Return to BOOST Pathways to save this completion and unlock your next step.</p><button type="button" id="boostSaveReturn" style="padding:13px 20px;border:0;border-radius:10px;background:#0d6248;color:#fff;font-weight:900;cursor:pointer">Save Completion & Return to BOOST</button>';
- document.getElementById('boostSaveReturn').onclick=function(){target.searchParams.set('boost_complete',moduleId);target.searchParams.set('boost_nonce',nonce);location.assign(target.toString())};
+ document.getElementById('boostSaveReturn').onclick=function(){
+   const evidence={module:'ai',source:'ai_literacy_completed_activity',version:2,completedAt:new Date().toISOString(),sector:st.sector||null,promptScore:st.prompt,challengeCompleted:st.done.slice(1).every(Boolean),resultLabel:document.getElementById('label')?.textContent||'',overallScore:document.getElementById('overall')?.textContent||''};
+   if(!evidence.challengeCompleted){alert('Complete the workplace challenge before saving.');return}
+   target.searchParams.set('boost_complete',moduleId);target.searchParams.set('boost_nonce',nonce);
+   const hash=new URLSearchParams();hash.set('boost_ai_receipt',JSON.stringify({nonce,evidence}));target.hash=hash.toString();
+   location.assign(target.toString())
+ };
 }
 
 </script>
